@@ -235,13 +235,13 @@ public class FlutterBluePlugin implements FlutterPlugin, MethodCallHandler, Requ
 
             case "startScan":
             {
-                ensurePermissionBeforeAction(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? Manifest.permission.BLUETOOTH_SCAN : Manifest.permission.ACCESS_FINE_LOCATION, (granted, permission) -> {
-                    if (granted)
+                //ensurePermissionBeforeAction(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? Manifest.permission.BLUETOOTH_SCAN : Manifest.permission.ACCESS_FINE_LOCATION, (granted, permission) -> {
+                    //if (granted)
                         startScan(call, result);
-                    else
-                        result.error(
-                                "no_permissions", String.format("flutter_blue plugin requires %s for scanning", permission), null);
-                });
+                    //else
+                      //  result.error(
+                        //        "no_permissions", String.format("flutter_blue plugin requires %s for scanning", permission), null);
+                //});
                 break;
             }
 
@@ -834,15 +834,17 @@ public class FlutterBluePlugin implements FlutterPlugin, MethodCallHandler, Requ
     private void startScan21(Protos.ScanSettings proto) throws IllegalStateException {
         BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
         if(scanner == null) throw new IllegalStateException("getBluetoothLeScanner() is null. Is the Adapter on?");
-        int scanMode = proto.getAndroidScanMode();
-        int count = proto.getServiceUuidsCount();
-        List<ScanFilter> filters = new ArrayList<>(count);
-        for(int i = 0; i < count; i++) {
-            String uuid = proto.getServiceUuids(i);
-            ScanFilter f = new ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(uuid)).build();
-            filters.add(f);
-        }
-        ScanSettings settings = new ScanSettings.Builder().setScanMode(scanMode).build();
+
+        final List<ScanFilter> filters = new ArrayList<>();
+        filters.add(BluetoothManagerHelper.getFilterFromUUID("fb0b57a2-8228-44cd-913a-94a122ba1206"));
+
+        final ScanSettings settings  = new ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
+            .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
+            .setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
+            .setReportDelay(0)
+            .build();
         scanner.startScan(filters, settings, getScanCallback21());
     }
 
