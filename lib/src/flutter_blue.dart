@@ -116,6 +116,7 @@ class FlutterBlue {
     List<Guid> withDevices = const [],
     Duration? timeout,
     bool allowDuplicates = false,
+    String? uuid,
   }) async* {
     var settings = protos.ScanSettings.create()
       ..androidScanMode = scanMode.value
@@ -139,7 +140,10 @@ class FlutterBlue {
     _scanResults.add(<ScanResult>[]);
 
     try {
-      await _channel.invokeMethod('startScan', settings.writeToBuffer());
+      await _channel.invokeMethod('startScan', <String, dynamic>{
+        'uuid': uuid,
+        'settings': settings.writeToBuffer(),
+      });
     } catch (e) {
       print('Error starting scan.');
       _stopScanPill.add(null);
@@ -181,13 +185,15 @@ class FlutterBlue {
     List<Guid> withDevices = const [],
     Duration? timeout,
     bool allowDuplicates = false,
+    String? uuid,
   }) async {
     await scan(
             scanMode: scanMode,
             withServices: withServices,
             withDevices: withDevices,
             timeout: timeout,
-            allowDuplicates: allowDuplicates)
+            allowDuplicates: allowDuplicates,
+            uuid: uuid),
         .drain();
     return _scanResults.value;
   }

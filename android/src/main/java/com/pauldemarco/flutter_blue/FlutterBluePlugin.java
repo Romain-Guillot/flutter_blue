@@ -768,14 +768,15 @@ public class FlutterBluePlugin implements FlutterPlugin, MethodCallHandler, Requ
     };
 
     private void startScan(MethodCall call, Result result) {
-        byte[] data = call.arguments();
+        byte[] data = call.argument("settings");
+        String uuid = call.argument("uuid");
         Protos.ScanSettings settings;
         try {
             settings = Protos.ScanSettings.newBuilder().mergeFrom(data).build();
             allowDuplicates = settings.getAllowDuplicates();
             macDeviceScanned.clear();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                startScan21(settings);
+                startScan21(settings, uuid);
             } else {
                 startScan18(settings);
             }
@@ -831,7 +832,9 @@ public class FlutterBluePlugin implements FlutterPlugin, MethodCallHandler, Requ
     }
 
     @TargetApi(21)
-    private void startScan21(Protos.ScanSettings proto) throws IllegalStateException {
+    private void startScan21(Protos.ScanSettings proto, String uuid) throws IllegalStateException {
+        log(LogLevel.DEBUG, "[startScan21] start scan with uuid " + uuid);
+
         BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
         if(scanner == null) throw new IllegalStateException("getBluetoothLeScanner() is null. Is the Adapter on?");
 
