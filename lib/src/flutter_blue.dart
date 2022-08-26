@@ -193,7 +193,7 @@ class FlutterBlue {
             withDevices: withDevices,
             timeout: timeout,
             allowDuplicates: allowDuplicates,
-            uuid: uuid),
+            uuid: uuid)
         .drain();
     return _scanResults.value;
   }

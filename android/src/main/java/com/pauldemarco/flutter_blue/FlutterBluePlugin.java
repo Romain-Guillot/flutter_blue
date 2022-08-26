@@ -839,7 +839,10 @@ public class FlutterBluePlugin implements FlutterPlugin, MethodCallHandler, Requ
         if(scanner == null) throw new IllegalStateException("getBluetoothLeScanner() is null. Is the Adapter on?");
 
         final List<ScanFilter> filters = new ArrayList<>();
-        filters.add(BluetoothManagerHelper.getFilterFromUUID("48b7a33a-9b78-48b8-a821-357711d92f81"));
+        if (uuid != null) {
+            filters.add(BluetoothManagerHelper.getFilterFromUUID(uuid));
+        }
+        
 
         final ScanSettings settings  = new ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
